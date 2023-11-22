@@ -1,11 +1,13 @@
 import { get, push, ref, set } from "firebase/database";
-import { dataBase } from "./firebase";
+import { database } from "./firebase";
 
-export const fbUsers = async (email, userName,userId ) => {
-  const usersRef = ref(dataBase, 'users');
+export const fbUsers = async (email, userName,userId,avtarImage ) => {
+  console.log(avtarImage,"avtarImage")
+  const usersRef = ref(database, 'users');
   const newRecordRef = push(usersRef);
   try {
      set(newRecordRef, {
+      avtarImage,
       userId: userId,
       userName: userName,
       email: email,
@@ -18,7 +20,7 @@ export const fbUsers = async (email, userName,userId ) => {
 
 export const getAllUsers = async () => {
   try {
-    const usersRef = ref(dataBase,'users');
+    const usersRef = ref(database,'users');
 
     const snapshot = await get(usersRef);
 

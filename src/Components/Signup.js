@@ -4,17 +4,21 @@ import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import InputAdornment from "@mui/material/InputAdornment";
 import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
+import { Input, InputBase } from "@mui/material";
+
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { UserSignUp } from "../Firebase/Authentication";
 import { fbUsers } from "../Firebase/fbUsers";
+import { makeStyles } from "@material-ui/styles";
 
 function Copyright(props) {
   return (
@@ -34,24 +38,48 @@ function Copyright(props) {
   );
 }
 
+const useStyles = makeStyles((theme) => ({
+  fileInputContainer: {
+    display: "block",
+    border: "1px solid #ccc",
+    padding: "10px",
+    cursor: "pointer",
+  },
+  fileInputLabel: {
+    marginLeft: "10px",
+  },
+  fileInput: {
+    display: "none",
+  },
+}));
+
+
+
 const theme = createTheme();
 
 export default function SignUp() {
-  const navigate = useNavigate()
+  const [inputImage,setInputImage] = React.useState([]);
+  const navigate = useNavigate();
+  const classes = useStyles();
 
+  const handleChange = (e) => {
+    const imageUrl = URL.createObjectURL(e.target.files[0]);
+    setInputImage(imageUrl);
+  };
+        
   const handleSubmit = async (event) => {
     try {
       event.preventDefault();
-      const data = new FormData(event.currentTarget)
-      const email = data.get("email")
-      const password = data.get("password")
-      const userName = data.get('firstName') + data.get('lastName')
-      const userCred = await UserSignUp(email, password)
+      const data = new FormData(event.currentTarget);
+      const email = data.get("email");
+      const password = data.get("password");
+      const userName = data.get("firstName") + data.get("lastName");
+      const userCred = await UserSignUp(email, password);
       const userId = userCred.user.uid;
-      await fbUsers(email,userName,userId)
-      navigate('/');
+      await fbUsers(email, userName, userId,inputImage);
+      navigate("/");
     } catch (err) {
-      console.log(err,"errror")
+      console.log(err, "errror");
     }
   };
 
@@ -126,13 +154,20 @@ export default function SignUp() {
                   autoComplete="new-password"
                 />
               </Grid>
+
               <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Checkbox value="allowExtraEmails" color="primary" />
-                  }
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
+                <label className={classes.fileInputContainer}>
+                  <InputBase
+                    required
+                    fullWidth
+                    placeholder="Choose your Avatar Image"
+                    name="inputfie"
+                    type="file"
+                    className={classes.fileInput}
+                    onChange={handleChange}
+                  />
+                  {/* <span className={classes.fileInputLabel}>Choose a file</span> */}
+                </label>
               </Grid>
             </Grid>
             <Button
