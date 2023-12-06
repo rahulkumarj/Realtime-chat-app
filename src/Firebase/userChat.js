@@ -17,24 +17,43 @@ export const chatMessages = (senderEmail, recieverEmail, message) => {
   const chatRoomEmail = senderEmail + recieverEmail;
   const _chatRoomEmail = recieverEmail + senderEmail; 
   const chatRoomRef = ref(database, "chats/", chatRoomEmail);
+  const messageObject = { senderEmail, recieverEmail, message };
+  const chatObject = [
+    {
+      chatRoomEmail,
+      message: [messageObject],
+    },
+  ];
+  const chatRoomObject = {
+    chatRoomEmail,
+    message: [messageObject],
+  }
 
   if (!message) {
     alert("no messages");
     return;
   }
 
-  const messageObject = { senderEmail, recieverEmail, message };
 
   get(chatRoomRef)
     .then((snapshot) => {
       const chatRoomExists = snapshot.exists();
       const snapshotArray = snapshot.val();
 
+      console.log(snapshotArray,"snapshotArraysnapshotArray==>>01")
+
       if (chatRoomExists) {
         const chatRoomEmailExists = snapshotArray.find(
           (ele) => ele.chatRoomEmail === chatRoomEmail
         );
-       
+        if(!chatRoomEmailExists){
+          snapshotArray.push(chatRoomObject)
+          console.log(snapshotArray,"snapshotArraysnapshotArray==>>02")
+          set(chatRoomRef, snapshotArray);
+          console.log("chatRoomEmail does not exists");
+          return; 
+        }
+       console.log(chatRoomEmailExists,"chatRoomEmailExistschatRoomEmailExists...>>")
         const chatRefData = snapshotArray.map((childSnapShotValue) => {
           if (childSnapShotValue.chatRoomEmail === chatRoomEmail || childSnapShotValue.chatRoomEmail === _chatRoomEmail) {
             const existingMessages = childSnapShotValue.message || [];
@@ -51,12 +70,6 @@ export const chatMessages = (senderEmail, recieverEmail, message) => {
 
         set(chatRoomRef, chatRefData);
       } else {
-        const chatObject = [
-          {
-            chatRoomEmail,
-            message: [messageObject],
-          },
-        ];
         set(chatRoomRef, chatObject);
       }
     })

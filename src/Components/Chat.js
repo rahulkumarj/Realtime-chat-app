@@ -42,7 +42,7 @@ const useStyles = makeStyles({
   },
 });
 
-const Chat = () => {
+const Chat = () => { 
   const [users, setUsers] = useState([]);
   const [connectedUser, setConnectedUser] = useState(null);
   const [cchatMessages, setCChatMessages] = useState(null);
@@ -71,16 +71,16 @@ const Chat = () => {
     useEffect(()=>{
       const chatRoomEmail = auth?.currentUser?.email + connectedUser?.email
       const chatRoomRef = ref(database, 'chats/' , chatRoomEmail);
-      onValue(chatRoomRef, (snapshot) => {
-        const data = snapshot.val();
-        if(data?.length){
-        data?.filter((item)=>{
-          if(item.chatRoomEmail === chatRoomEmail )
-          setCChatMessages(item.message);
-         })
-        }
-      });
-    },[input])
+        onValue(chatRoomRef, (snapshot) => {
+          const data = snapshot.val();
+          if(data?.length){
+          data?.filter((item)=>{
+            if(item.chatRoomEmail === chatRoomEmail )
+            setCChatMessages(item.message);
+           })
+          }
+        });
+    },[input,connectedUser])
     
   const handleLogout = () => {
     LogOutUser();
